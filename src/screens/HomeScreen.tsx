@@ -19,6 +19,7 @@ import { calculateDailySummary } from '../utils/waterSummary';
 interface HomeScreenProps {
   dailyGoalMl: number;
   settings: AppSettings;
+  userName: string | null;
 }
 
 /**
@@ -35,7 +36,7 @@ interface HomeScreenProps {
  * La meta diaria (`dailyGoalMl`) viene de App, que la comparte con la
  * pantalla de Estadísticas para que ambas siempre vean el mismo valor.
  */
-export default function HomeScreen({ dailyGoalMl, settings }: HomeScreenProps) {
+export default function HomeScreen({ dailyGoalMl, settings, userName }: HomeScreenProps) {
   const [todayEntries, setTodayEntries] = useState<WaterEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -76,7 +77,7 @@ export default function HomeScreen({ dailyGoalMl, settings }: HomeScreenProps) {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <MotivationalMessage />
+        <MotivationalMessage userName={userName} />
 
         {!isLoading && (
           <>

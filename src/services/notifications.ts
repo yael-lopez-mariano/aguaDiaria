@@ -104,6 +104,17 @@ export async function ensureAndroidNotificationChannelAsync(): Promise<void> {
   });
 }
 
+/**
+ * Cancela cualquier recordatorio de hidratación programado, sin importar
+ * el día u horario al que apunte. Se usa al "borrar todos los datos" en
+ * Configuración: como la meta y los horarios vuelven a sus valores por
+ * defecto, los recordatorios programados con la configuración anterior
+ * quedarían "huérfanos" si no los cancelamos aquí.
+ */
+export async function cancelAllWaterRemindersAsync(): Promise<void> {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+}
+
 export interface NotificationPermissionState {
   granted: boolean;
   /** Si es `false`, el sistema ya no mostrará el diálogo de permiso de nuevo. */

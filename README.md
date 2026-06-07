@@ -29,11 +29,12 @@ hidratarse:
 
 | Parte | Para qué sirve | Por qué importa |
 | --- | --- | --- |
+| 👋 **Bienvenida personalizada** | La primera vez que abres la app te pregunta tu nombre, y desde ahí te saluda y arma frases motivadoras (y un poco chistosas) que lo incluyen, mezcladas al azar para que no se sientan repetitivas | Una app que te llama por tu nombre se siente hecha para ti, no como un formulario más |
 | 💧 **Registro rápido** | Sumar agua con un toque desde la pantalla principal | Si registrar cuesta trabajo, el hábito se abandona — por eso es lo más simple e inmediato posible |
 | 📊 **Progreso visual** | Un tanque animado que se llena hacia tu meta diaria | Ver el avance en tiempo real motiva a seguir, mucho más que un número suelto |
 | 🔔 **Recordatorios inteligentes y personalizados** | Notificaciones en la mañana, tarde y noche —solo si aún no llegaste a la meta—, con un mensaje que cambia según cuánta agua te falta y un sonido propio de "gota de agua" 💧🔊 | Un aviso que te dice justo lo que te falta (y suena distinto a cualquier otra app) se siente hecho para ti, no genérico |
 | 🕒 **Historial editable** | Consulta tus registros por día, con fecha y hora, y borra los que te equivocaste | Un hábito se sostiene si confías en tus datos; poder corregirlos es parte de eso |
-| ⚙️ **Configuración a tu medida** | Cambia tu meta diaria, activa/desactiva avisos y ajusta sus horarios | Cada persona tiene rutinas distintas — la app debe adaptarse a ti, no al revés |
+| ⚙️ **Configuración a tu medida** | Cambia tu meta diaria, activa/desactiva avisos y ajusta sus horarios — y, si quieres empezar de cero, borra todos tus datos (registros, meta, recordatorios y nombre) con un solo botón y confirmación previa | Cada persona tiene rutinas distintas — la app debe adaptarse a ti, no al revés, e incluso "olvidarse" de ti si así lo pides |
 | 🎨 **Diseño cálido y animado** | Tarjetas redondeadas, degradados azules, ilustraciones de gotas y animaciones suaves | Una app de bienestar debe sentirse agradable de usar, no como una obligación más |
 
 ---

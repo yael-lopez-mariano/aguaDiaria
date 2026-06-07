@@ -1,6 +1,7 @@
 import React from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import { confirmDestructiveAction } from '../utils/confirm';
 
 interface DangerZoneCardProps {
   onConfirmClear: () => void;
@@ -8,18 +9,24 @@ interface DangerZoneCardProps {
 
 /**
  * Tarjeta para borrar todos los datos guardados de la app (registros,
- * meta diaria y configuración de recordatorios). Pide confirmación antes
- * de actuar, ya que es una acción permanente que no se puede deshacer.
+ * meta diaria, configuración de recordatorios y nombre guardado, dejando
+ * la app como recién instalada). Pide confirmación antes de actuar, ya
+ * que es una acción permanente que no se puede deshacer.
+ *
+ * Usamos `confirmDestructiveAction` en lugar de `Alert.alert` directo
+ * porque en la versión web (PWA) `Alert.alert` no muestra ningún diálogo;
+ * ese helper cae a `window.confirm` ahí para que la confirmación sí aparezca.
  */
 export default function DangerZoneCard({ onConfirmClear }: DangerZoneCardProps) {
   const handlePress = () => {
-    Alert.alert(
-      'Borrar todos los datos',
-      'Esto eliminará tus registros de agua, tu meta diaria y tus horarios de recordatorio guardados en este celular. Esta acción no se puede deshacer. ¿Quieres continuar?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Borrar todo', style: 'destructive', onPress: onConfirmClear },
-      ],
+    confirmDestructiveAction(
+      {
+        title: '¿Borrar todos tus datos?',
+        message:
+          'Esto eliminará tus registros de agua, tu meta diaria, tus recordatorios y tu nombre guardado en este celular. La app quedará como recién instalada y volverá a pedirte tu nombre. Esta acción no se puede deshacer.',
+        confirmLabel: 'Borrar todo',
+      },
+      onConfirmClear,
     );
   };
 
@@ -28,7 +35,7 @@ export default function DangerZoneCard({ onConfirmClear }: DangerZoneCardProps) 
       <Text style={styles.title}>Zona de riesgo ⚠️</Text>
       <Text style={styles.subtitle}>
         Borra de forma permanente todo lo que AguaDiaria guardó en este celular: tus registros,
-        tu meta diaria y tus recordatorios.
+        tu meta diaria, tus recordatorios y tu nombre. Es como empezar de nuevo desde cero.
       </Text>
       <Pressable style={styles.button} onPress={handlePress}>
         <Text style={styles.buttonText}>Borrar todos los datos</Text>

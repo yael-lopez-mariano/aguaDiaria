@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
-import { Alert, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
 import { WaterEntry } from '../types/water';
+import { confirmDestructiveAction } from '../utils/confirm';
 
 interface HistoryEntryCardProps {
   entry: WaterEntry;
@@ -18,23 +19,19 @@ export default function HistoryEntryCard({ entry, onDelete }: HistoryEntryCardPr
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const confirmDelete = () => {
-    Alert.alert(
-      'Eliminar registro',
-      `¿Quieres eliminar el registro de ${entry.amountMl} ml del ${entry.date} a las ${entry.time}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => {
-            Animated.timing(fadeAnim, {
-              toValue: 0,
-              duration: 220,
-              useNativeDriver: true,
-            }).start(() => onDelete(entry.id));
-          },
-        },
-      ],
+    confirmDestructiveAction(
+      {
+        title: 'Eliminar registro',
+        message: `¿Quieres eliminar el registro de ${entry.amountMl} ml del ${entry.date} a las ${entry.time}?`,
+        confirmLabel: 'Eliminar',
+      },
+      () => {
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 220,
+          useNativeDriver: true,
+        }).start(() => onDelete(entry.id));
+      },
     );
   };
 

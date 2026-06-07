@@ -35,7 +35,9 @@
         "expo-notifications",
         {
           "color": "#2F9BFF",
-          "sounds": ["./assets/sounds/water_drop.wav"]
+          "sounds": [
+            "./assets/sounds/water_drop.wav"
+          ]
         }
       ],
       [
@@ -47,6 +49,11 @@
           "backgroundColor": "#EAF6FF"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f17eb831-c101-4981-9c4e-515cd3fa5852"
+      }
+    }
   }
 }

@@ -5,12 +5,17 @@ import { gradients } from '../constants/colors';
 import { getGreeting } from '../utils/date';
 import WaterDropsIllustration from './WaterDropsIllustration';
 
+interface MotivationalMessageProps {
+  /** Nombre guardado en la bienvenida; si no hay (o se borró), se usan mensajes genéricos. */
+  userName?: string | null;
+}
+
 /**
- * Mensajes motivadores agrupados por momento del día.
- * Se elige uno al azar dentro del grupo correspondiente para que
- * la app se sienta un poco distinta cada vez que se abre.
+ * Mensajes genéricos agrupados por momento del día: se usan cuando todavía
+ * no tenemos un nombre guardado, y también se mezclan con los personalizados
+ * para que el mensaje no siempre lleve el nombre y se sienta más variado.
  */
-const MESSAGES_BY_MOMENT = {
+const GENERIC_MESSAGES_BY_MOMENT = {
   morning: [
     'Buenos días, recuerda hidratarte 💧',
     'Empieza el día con un buen vaso de agua 🌅💧',
@@ -25,24 +30,71 @@ const MESSAGES_BY_MOMENT = {
   ],
 };
 
-function pickMessage(): string {
-  const hour = new Date().getHours();
-  let group = MESSAGES_BY_MOMENT.night;
-  if (hour >= 5 && hour < 12) group = MESSAGES_BY_MOMENT.morning;
-  else if (hour >= 12 && hour < 19) group = MESSAGES_BY_MOMENT.afternoon;
+/**
+ * Plantillas personalizadas con `{name}`: mezclan tono motivador y un poco
+ * de humor, para que cuando la app conoce tu nombre se sienta hecha para ti
+ * y no repita siempre el mismo mensaje.
+ */
+const PERSONALIZED_TEMPLATES_BY_MOMENT = {
+  morning: [
+    '{name}, buenos días ☀️ Arranca el día con un buen vaso de agua 💧',
+    'Oye {name}, tu primer vaso de agua del día te está esperando 👋💧',
+    '{name}, el café no cuenta como hidratación... ¡vamos por agua! ☕😅💧',
+  ],
+  afternoon: [
+    '{name}, una pausa para hidratarte te ayuda a seguir con energía ⚡💧',
+    'Psst, {name}... ¿ya tomaste agua hoy o solo café? 👀☕',
+    '{name}, tu cuerpo es agua en su mayoría: ¡rellénalo! 🚰😄',
+    'No te lo decimos para molestar, {name}: ¡es hora de tomar agua! 💧😉',
+  ],
+  night: [
+    '{name}, cierra el día hidratándote: tu cuerpo te lo va a agradecer 🌙💧',
+    'No olvides tomar agua antes de dormir, {name} 🌌🥤',
+    '{name}, un último vaso de agua y a descansar tranquilo 😴💧',
+  ],
+};
 
-  const randomIndex = Math.floor(Math.random() * group.length);
-  return group[randomIndex];
+type ReminderMomentGroup = keyof typeof GENERIC_MESSAGES_BY_MOMENT;
+
+function getMomentGroup(): ReminderMomentGroup {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 19) return 'afternoon';
+  return 'night';
+}
+
+/**
+ * Arma la lista de mensajes posibles para el momento del día actual:
+ * si hay un nombre guardado, mezcla las plantillas personalizadas (ya con
+ * el nombre puesto) con las genéricas; si no, usa solo las genéricas.
+ * Elegir entre ambas evita que el mensaje repita el nombre cada vez y hace
+ * que la app se sienta más variada de una abierta a otra.
+ */
+function buildMessagePool(userName: string | null | undefined, group: ReminderMomentGroup): string[] {
+  const generic = GENERIC_MESSAGES_BY_MOMENT[group];
+  if (!userName) return generic;
+
+  const personalized = PERSONALIZED_TEMPLATES_BY_MOMENT[group].map((template) =>
+    template.replace('{name}', userName),
+  );
+  return [...personalized, ...generic];
+}
+
+function pickMessage(userName: string | null | undefined): string {
+  const pool = buildMessagePool(userName, getMomentGroup());
+  const randomIndex = Math.floor(Math.random() * pool.length);
+  return pool[randomIndex];
 }
 
 /**
  * Tarjeta principal de bienvenida: un degradado azul con el saludo, un
- * mensaje motivador que cambia según la hora, y una pequeña ilustración
- * de gotas flotantes. Es lo primero que ve el usuario, así que concentra
+ * mensaje motivador que cambia según la hora (y, si conocemos el nombre
+ * del usuario, también según quién es), y una pequeña ilustración de
+ * gotas flotantes. Es lo primero que ve el usuario, así que concentra
  * buena parte de la "personalidad" amigable de la app.
  */
-export default function MotivationalMessage() {
-  const message = useRef(pickMessage()).current;
+export default function MotivationalMessage({ userName }: MotivationalMessageProps) {
+  const message = useRef(pickMessage(userName)).current;
   const greeting = useRef(getGreeting()).current;
 
   // Animación sutil de aparición: la tarjeta se desliza hacia arriba
@@ -80,7 +132,9 @@ export default function MotivationalMessage() {
       >
         <View style={styles.textBlock}>
           <Text style={styles.appTitle}>AguaDiaria</Text>
-          <Text style={styles.greeting}>{greeting} 👋</Text>
+          <Text style={styles.greeting}>
+            {userName ? `${greeting}, ${userName}` : greeting} 👋
+          </Text>
           <Text style={styles.message}>{message}</Text>
         </View>
 
