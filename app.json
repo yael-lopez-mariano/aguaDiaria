@@ -20,13 +20,22 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "lang": "es",
+      "name": "AguaDiaria",
+      "shortName": "AguaDiaria",
+      "description": "Registra tu consumo diario de agua, sigue tu progreso y recibe recordatorios para mantenerte hidratado.",
+      "themeColor": "#2F9BFF",
+      "backgroundColor": "#EAF6FF",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       [
         "expo-notifications",
         {
-          "color": "#2F9BFF"
+          "color": "#2F9BFF",
+          "sounds": ["./assets/sounds/water_drop.wav"]
         }
       ],
       [

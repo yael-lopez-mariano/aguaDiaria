@@ -31,7 +31,7 @@ hidratarse:
 | --- | --- | --- |
 | 💧 **Registro rápido** | Sumar agua con un toque desde la pantalla principal | Si registrar cuesta trabajo, el hábito se abandona — por eso es lo más simple e inmediato posible |
 | 📊 **Progreso visual** | Un tanque animado que se llena hacia tu meta diaria | Ver el avance en tiempo real motiva a seguir, mucho más que un número suelto |
-| 🔔 **Recordatorios inteligentes** | Notificaciones en la mañana, tarde y noche — solo si aún no llegaste a la meta | Evita interrupciones innecesarias: solo te avisa cuando de verdad te hace falta |
+| 🔔 **Recordatorios inteligentes y personalizados** | Notificaciones en la mañana, tarde y noche —solo si aún no llegaste a la meta—, con un mensaje que cambia según cuánta agua te falta y un sonido propio de "gota de agua" 💧🔊 | Un aviso que te dice justo lo que te falta (y suena distinto a cualquier otra app) se siente hecho para ti, no genérico |
 | 🕒 **Historial editable** | Consulta tus registros por día, con fecha y hora, y borra los que te equivocaste | Un hábito se sostiene si confías en tus datos; poder corregirlos es parte de eso |
 | ⚙️ **Configuración a tu medida** | Cambia tu meta diaria, activa/desactiva avisos y ajusta sus horarios | Cada persona tiene rutinas distintas — la app debe adaptarse a ti, no al revés |
 | 🎨 **Diseño cálido y animado** | Tarjetas redondeadas, degradados azules, ilustraciones de gotas y animaciones suaves | Una app de bienestar debe sentirse agradable de usar, no como una obligación más |
@@ -144,7 +144,7 @@ genera directamente un **APK** instalable (en lugar de un AAB para Play Store).
 
 ---
 
-## 🌐 Generar una versión web (para Netlify u otro hosting estático)
+## 🌐 Generar una versión web — y como PWA (para Netlify u otro hosting estático)
 
 Expo puede exportar esta misma app como sitio web estático:
 
@@ -157,13 +157,35 @@ Esto genera la carpeta `dist/` lista para publicar. En Netlify:
 - **Build command:** `npx expo export --platform web`
 - **Publish directory:** `dist`
 
-> ⚠️ Importante: la versión web es útil para mostrar o probar la interfaz
-> desde un navegador, pero **no es la app real para celular**. Funciones
-> que dependen de APIs nativas —como las notificaciones push de
-> `expo-notifications`— no funcionan igual (o no funcionan) en la web.
-> La app "de verdad", con notificaciones y guardado persistente en el
-> dispositivo, es la que se instala como APK (compilada con EAS Build,
-> ver arriba) o se prueba con Expo Go durante el desarrollo.
+### 📲 Esta versión web ya es una PWA (Progressive Web App)
+
+El proyecto incluye en [`public/`](public/) todo lo necesario para que, al
+publicarla, los usuarios puedan **instalarla desde el navegador** como si
+fuera una app nativa ("Agregar a pantalla de inicio" / "Instalar app"):
+
+- [`public/manifest.json`](public/manifest.json) — nombre, colores, ícono e
+  indica que se abra en modo `standalone` (sin la barra del navegador)
+- [`public/index.html`](public/index.html) — plantilla HTML que enlaza el
+  manifiesto y agrega los metadatos para iOS/Android (`apple-touch-icon`,
+  `theme-color`, etc.)
+- [`public/service-worker.js`](public/service-worker.js) — guarda en caché
+  lo que el usuario va visitando, para que la app siga abriendo (con la
+  última información cargada) incluso sin conexión
+- `public/icon-192.png` y `public/icon-512.png` — íconos para el ícono de
+  la pantalla de inicio
+
+No necesitas hacer nada extra: estos archivos se copian automáticamente a
+`dist/` en cada `expo export --platform web`.
+
+> ⚠️ Importante: la versión web/PWA es útil para mostrar o probar la
+> interfaz desde un navegador y para que la gente la instale rápido sin
+> pasar por una tienda de apps, pero **no reemplaza a la app nativa**.
+> Las notificaciones programadas de `expo-notifications` (con su sonido de
+> gota de agua personalizado) son una función **nativa**: dependen de
+> Android/iOS y no funcionan igual —o no funcionan— dentro de un navegador,
+> incluso instalada como PWA. La experiencia completa, con recordatorios
+> reales y guardado persistente en el dispositivo, es la app que se instala
+> como APK (compilada con EAS Build, ver arriba) o se prueba con Expo Go.
 
 ---
 

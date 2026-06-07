@@ -24,9 +24,16 @@ export type NotificationPermissionStatus = 'checking' | 'granted' | 'denied';
  * @param summary Resumen del día actual (total, conteo, mañana/tarde-noche).
  * @param settings Configuración del usuario: si las notificaciones están
  *   activas y a qué hora debe sonar cada recordatorio.
+ * @param dailyGoalMl Meta diaria configurada: se usa para calcular cuánta
+ *   agua le falta al usuario y así personalizar el mensaje de cada aviso.
  * @param isReady Indica si los registros de hoy ya se cargaron del almacenamiento.
  */
-export function useWaterReminders(summary: DailySummary, settings: AppSettings, isReady: boolean) {
+export function useWaterReminders(
+  summary: DailySummary,
+  settings: AppSettings,
+  dailyGoalMl: number,
+  isReady: boolean,
+) {
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermissionStatus>('checking');
 
   // Pide permiso solo si el sistema todavía puede preguntar; si el usuario
@@ -72,13 +79,23 @@ export function useWaterReminders(summary: DailySummary, settings: AppSettings, 
 
   useEffect(() => {
     if (!isReady || permissionStatus !== 'granted') return;
-    syncWaterReminders(summary, settings);
+    syncWaterReminders(summary, settings, dailyGoalMl);
     // A propósito NO dependemos de todo el objeto `summary` (cambia en cada
-    // registro), sino solo de las dos banderas que deciden qué recordatorios
-    // siguen haciendo falta: así evitamos reprogramar de más. `settings` sí
-    // se incluye completo: cualquier cambio ahí (apagar notificaciones,
-    // mover un horario) debe re-sincronizar de inmediato.
-  }, [isReady, permissionStatus, summary.drankInMorning, summary.drankInAfternoonOrNight, settings]);
+    // registro), sino de las banderas que deciden qué recordatorios siguen
+    // haciendo falta y del total (que entra en el mensaje personalizado):
+    // así evitamos reprogramar de más sin perder la personalización.
+    // `settings` y `dailyGoalMl` sí se incluyen completos: cualquier cambio
+    // ahí (apagar notificaciones, mover un horario, ajustar la meta) debe
+    // re-sincronizar de inmediato.
+  }, [
+    isReady,
+    permissionStatus,
+    summary.drankInMorning,
+    summary.drankInAfternoonOrNight,
+    summary.totalMl,
+    settings,
+    dailyGoalMl,
+  ]);
 
   return { permissionStatus, requestPermission };
 }

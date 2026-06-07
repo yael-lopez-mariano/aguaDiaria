@@ -66,7 +66,7 @@ export default function HomeScreen({ dailyGoalMl, settings }: HomeScreenProps) {
   }, []);
 
   const summary = calculateDailySummary(todayEntries);
-  const { permissionStatus, requestPermission } = useWaterReminders(summary, settings, !isLoading);
+  const { permissionStatus, requestPermission } = useWaterReminders(summary, settings, dailyGoalMl, !isLoading);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
