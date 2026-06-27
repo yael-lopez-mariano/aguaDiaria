@@ -105,9 +105,10 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     marginTop: 2,
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textSecondary,
     textAlign: 'center',
+    flexShrink: 1,
   },
   chart: {
     flexDirection: 'row',

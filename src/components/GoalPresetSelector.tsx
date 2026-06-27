@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
   },
   presetChip: {
     flex: 1,
-    marginHorizontal: 4,
-    paddingVertical: 12,
+    marginHorizontal: 3,
+    paddingVertical: 10,
     borderRadius: 16,
     alignItems: 'center',
     backgroundColor: colors.background,
