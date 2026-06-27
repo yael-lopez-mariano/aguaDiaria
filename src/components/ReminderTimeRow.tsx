@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../constants/colors';
 import { ReminderTime } from '../types/settings';
 import { formatHourMinute } from '../utils/date';
@@ -15,16 +15,25 @@ interface ReminderTimeRowProps {
 const STEP_MINUTES = 1;
 const MINUTES_PER_DAY = 24 * 60;
 
-/** Suma (o resta) minutos a una hora del día, dando la vuelta a la medianoche. */
 function shiftTime(time: ReminderTime, deltaMinutes: number): ReminderTime {
   const totalMinutes = (time.hour * 60 + time.minute + deltaMinutes + MINUTES_PER_DAY) % MINUTES_PER_DAY;
   return { hour: Math.floor(totalMinutes / 60), minute: totalMinutes % 60 };
 }
 
+function toTimeValue(time: ReminderTime): string {
+  return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
+}
+
+function parseTimeValue(val: string): ReminderTime | null {
+  const [h, m] = val.split(':').map((s) => parseInt(s, 10));
+  if (isNaN(h) || isNaN(m)) return null;
+  return { hour: h % 24, minute: m % 60 };
+}
+
 /**
- * Fila para ajustar la hora de un recordatorio (mañana, tarde o noche)
- * en pasos de 15 minutos, con botones +/-. Se muestra atenuada y sin
- * funcionar cuando las notificaciones están apagadas.
+ * Fila para ajustar la hora de un recordatorio (mañana, tarde o noche).
+ * En web muestra un selector de hora nativo del navegador (estilo reloj)
+ * para elegir la hora de un clic. En móvil usa botones +/− de 1 minuto.
  */
 export default function ReminderTimeRow({ emoji, label, time, disabled, onChangeTime }: ReminderTimeRowProps) {
   return (
@@ -32,25 +41,44 @@ export default function ReminderTimeRow({ emoji, label, time, disabled, onChange
       <Text style={styles.emoji}>{emoji}</Text>
       <Text style={styles.label}>{label}</Text>
 
-      <Pressable
-        style={[styles.stepButton, disabled && styles.stepButtonDisabled]}
-        onPress={() => onChangeTime(shiftTime(time, -STEP_MINUTES))}
-        disabled={disabled}
-        hitSlop={6}
-      >
-        <Text style={styles.stepButtonText}>−</Text>
-      </Pressable>
+      {Platform.OS === 'web' ? (
+        <View style={[styles.webPickerWrapper, disabled && styles.webPickerDisabled]}>
+          <Text style={styles.webClockIcon}>🕐</Text>
+          <TextInput
+            value={toTimeValue(time)}
+            onChangeText={(val) => {
+              const parsed = parseTimeValue(val);
+              if (parsed) onChangeTime(parsed);
+            }}
+            editable={!disabled}
+            style={styles.webTimeInput}
+            // Pasamos type="time" al DOM para activar el selector nativo del navegador
+            {...({ type: 'time' } as object)}
+          />
+        </View>
+      ) : (
+        <>
+          <Pressable
+            style={[styles.stepButton, disabled && styles.stepButtonDisabled]}
+            onPress={() => onChangeTime(shiftTime(time, -STEP_MINUTES))}
+            disabled={disabled}
+            hitSlop={6}
+          >
+            <Text style={styles.stepButtonText}>−</Text>
+          </Pressable>
 
-      <Text style={styles.timeText}>{formatHourMinute(time.hour, time.minute)}</Text>
+          <Text style={styles.timeText}>{formatHourMinute(time.hour, time.minute)}</Text>
 
-      <Pressable
-        style={[styles.stepButton, disabled && styles.stepButtonDisabled]}
-        onPress={() => onChangeTime(shiftTime(time, STEP_MINUTES))}
-        disabled={disabled}
-        hitSlop={6}
-      >
-        <Text style={styles.stepButtonText}>+</Text>
-      </Pressable>
+          <Pressable
+            style={[styles.stepButton, disabled && styles.stepButtonDisabled]}
+            onPress={() => onChangeTime(shiftTime(time, STEP_MINUTES))}
+            disabled={disabled}
+            hitSlop={6}
+          >
+            <Text style={styles.stepButtonText}>+</Text>
+          </Pressable>
+        </>
+      )}
     </View>
   );
 }
@@ -76,6 +104,35 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textPrimary,
   },
+
+  // ── Web: selector nativo del navegador ─────────────────────────────────────
+  webPickerWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.teal,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  webPickerDisabled: {
+    borderColor: colors.tealLight,
+  },
+  webClockIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  webTimeInput: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.tealDark,
+    minWidth: 80,
+    // En web, TextInput ya no hereda el outline del navegador — sin borde extra
+    outlineStyle: 'none',
+  } as object,
+
+  // ── Nativo: botones +/− ────────────────────────────────────────────────────
   stepButton: {
     width: 30,
     height: 30,
