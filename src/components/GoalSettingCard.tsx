@@ -96,12 +96,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.teal,
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonDisabled: {
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.tealLight,
   },
   buttonText: {
     color: colors.textOnPrimary,

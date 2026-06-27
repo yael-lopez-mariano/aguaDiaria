@@ -37,7 +37,7 @@ export default function WelcomeScreen({ onSubmit }: WelcomeScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.teal} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.teal,
     borderRadius: 18,
     paddingVertical: 16,
     alignItems: 'center',

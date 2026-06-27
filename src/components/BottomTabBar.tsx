@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   tabLabelActive: {
-    color: colors.primaryDark,
+    color: colors.tealDark,
     fontWeight: '800',
   },
 });

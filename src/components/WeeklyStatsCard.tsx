@@ -57,7 +57,7 @@ export default function WeeklyStatsCard({ weeklySummary, goalMl }: WeeklyStatsCa
                 <View
                   style={[
                     styles.bar,
-                    { height: barHeight, backgroundColor: metGoal ? colors.success : colors.primary },
+                    { height: barHeight, backgroundColor: metGoal ? colors.success : colors.teal },
                   ]}
                 />
               </View>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '800',
-    color: colors.primaryDark,
+    color: colors.tealDark,
   },
   statLabel: {
     marginTop: 2,

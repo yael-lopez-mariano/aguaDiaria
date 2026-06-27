@@ -43,8 +43,8 @@ export default function RemindersSettingsCard({ settings, onChangeSettings }: Re
         <Switch
           value={settings.notificationsEnabled}
           onValueChange={toggleNotifications}
-          trackColor={{ false: colors.border, true: colors.primaryLight }}
-          thumbColor={settings.notificationsEnabled ? colors.primary : colors.card}
+          trackColor={{ false: colors.border, true: colors.tealLight }}
+          thumbColor={settings.notificationsEnabled ? colors.teal : colors.card}
         />
       </View>
 

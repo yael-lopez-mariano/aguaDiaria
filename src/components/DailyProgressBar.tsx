@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   percent: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.primaryDark,
+    color: colors.tealDark,
   },
   track: {
     height: 14,
@@ -72,6 +72,6 @@ const styles = StyleSheet.create({
   fill: {
     height: '100%',
     borderRadius: 8,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.teal,
   },
 });

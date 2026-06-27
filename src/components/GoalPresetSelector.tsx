@@ -115,8 +115,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   presetChipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.teal,
+    borderColor: colors.teal,
   },
   presetText: {
     fontSize: 15,
@@ -136,12 +136,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.teal,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepButtonDisabled: {
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.tealLight,
   },
   stepButtonText: {
     color: colors.textOnPrimary,

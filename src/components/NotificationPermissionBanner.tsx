@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 16,
     borderWidth: 1.5,
-    borderColor: colors.primaryLight,
+    borderColor: colors.tealLight,
   },
   emoji: {
     fontSize: 26,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   button: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.teal,
     borderRadius: 16,
     paddingVertical: 10,
     paddingHorizontal: 16,
