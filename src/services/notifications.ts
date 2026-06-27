@@ -89,6 +89,38 @@ const REMINDER_SLOT_CONFIGS: ReminderSlotConfig[] = [
 ];
 
 // ── Web notification support ──────────────────────────────────────────────────
+// Mensajes con humor para gente que se pasa el día en la computadora.
+// Cada momento tiene varias opciones: se elige una al azar para no repetir.
+
+type WebMoment = 'morning' | 'afternoon' | 'night';
+
+const WEB_FUNNY_MESSAGES: Record<WebMoment, Array<(r: string) => string>> = {
+  morning: [
+    (r) => `¿Ya encendiste la compu antes de hidratarte? Clásico. Te faltan ${r} — agua primero, después caos digital ☕`,
+    (r) => `Buenos días, héroe del teclado 🖥️ Tu cerebro es 75% agua y hoy lo arrancaste con café. Te faltan ${r} 💧`,
+    (r) => `Cargando sistema… ⚠️ Error: nivel de agua crítico. Bebe ${r} antes de abrir más pestañas`,
+    (r) => `Primera tarea del día: ${r} de agua. Lo demás puede esperar (el correo también) 💧`,
+  ],
+  afternoon: [
+    (r) => `Llevas horas mirando pantallas 👀 ¿Cuántos vasos tomaste? Exacto. Te faltan ${r} — Ctrl+Beber ya ⌨️`,
+    (r) => `¿Cuántas pestañas abiertas? Muchas. ¿Vasos de agua tomados? Pocos. Te faltan ${r}, cierra una y ve por agua 💧`,
+    (r) => `Spoiler: copiar y pegar no hidrata 🚰 Te faltan ${r} para tu meta. Para 30 segundos y ve por agua`,
+    (r) => `Tu próxima reunión puede esperar. Un vaso de agua, no. Te faltan ${r} y tu cerebro ya lo nota 💡`,
+    (r) => `Llevas más tiempo sin tomar agua que sin revisar el teléfono 📱 Te faltan ${r} — prioridades, amigo`,
+  ],
+  night: [
+    (r) => `Antes de cerrar pestañas, abre el grifo 🌙 Te faltan ${r} para cerrar tu meta de hoy`,
+    (r) => `El modo oscuro no hidrata 🖤 Te faltan ${r} — un vaso antes de apagar la compu y listo`,
+    (r) => `Sobreviviste otra jornada de pantallas 🎉 Tu cerebro pide ${r} de agua antes de desconectarse`,
+    (r) => `Último commit del día: ${r} de agua 💧 Después sí cierra todo y descansa`,
+  ],
+};
+
+function pickWebMessage(moment: WebMoment, remainingMl: number): string {
+  const pool = WEB_FUNNY_MESSAGES[moment];
+  const fn = pool[Math.floor(Math.random() * pool.length)];
+  return fn(formatRemainingMl(remainingMl));
+}
 
 let webReminderTimeouts: ReturnType<typeof setTimeout>[] = [];
 
@@ -128,9 +160,10 @@ async function scheduleWebReminders(
 
     if (delay <= 0) continue;
 
+    const moment = config.moment as WebMoment;
     const timeout = setTimeout(() => {
       new Notification(config.title, {
-        body: config.buildBody(remainingMl),
+        body: pickWebMessage(moment, remainingMl),
         icon: '/icon-192.png',
         badge: '/icon-192.png',
       });
