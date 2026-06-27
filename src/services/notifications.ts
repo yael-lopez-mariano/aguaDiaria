@@ -7,11 +7,10 @@ import { DailySummary } from '../types/water';
 /**
  * Servicio de notificaciones locales de AguaDiaria.
  *
- * Aquí vive toda la integración con `expo-notifications`: configurar cómo
- * se muestran las notificaciones, pedir permiso, preparar el canal de
- * Android y programar/cancelar los recordatorios del día. La pantalla
- * y los hooks no hablan directamente con `expo-notifications`, solo
- * usan las funciones que exportamos aquí.
+ * En Android/iOS usa expo-notifications para programar recordatorios reales.
+ * En web (PWA) usa la Web Notifications API con setTimeout: mientras la app
+ * esté abierta en el navegador, los avisos aparecen como notificaciones del
+ * sistema desde el costado de la pantalla, igual que WhatsApp Web.
  */
 
 // Para que una notificación se muestre mientras la app está abierta,
@@ -89,6 +88,60 @@ const REMINDER_SLOT_CONFIGS: ReminderSlotConfig[] = [
   },
 ];
 
+// ── Web notification support ──────────────────────────────────────────────────
+
+let webReminderTimeouts: ReturnType<typeof setTimeout>[] = [];
+
+function clearWebReminderTimeouts(): void {
+  webReminderTimeouts.forEach(clearTimeout);
+  webReminderTimeouts = [];
+}
+
+async function requestWebNotificationPermission(): Promise<boolean> {
+  if (typeof window === 'undefined' || !('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const result = await Notification.requestPermission();
+  return result === 'granted';
+}
+
+async function scheduleWebReminders(
+  summary: DailySummary,
+  settings: AppSettings,
+  dailyGoalMl: number,
+): Promise<void> {
+  clearWebReminderTimeouts();
+  if (!settings.notificationsEnabled) return;
+
+  const granted = await requestWebNotificationPermission();
+  if (!granted) return;
+
+  const now = Date.now();
+  const remainingMl = Math.max(dailyGoalMl - summary.totalMl, 0);
+
+  for (const config of REMINDER_SLOT_CONFIGS) {
+    if (!config.isStillNeeded(summary)) continue;
+
+    const { hour, minute } = settings.reminderTimes[config.moment];
+    const triggerDate = getTodayAt(hour, minute);
+    const delay = triggerDate.getTime() - now;
+
+    if (delay <= 0) continue;
+
+    const timeout = setTimeout(() => {
+      new Notification(config.title, {
+        body: config.buildBody(remainingMl),
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+      });
+    }, delay);
+
+    webReminderTimeouts.push(timeout);
+  }
+}
+
+// ── Native (Android / iOS) ────────────────────────────────────────────────────
+
 /** En Android, las notificaciones necesitan un "canal" antes de poder mostrarse. */
 export async function ensureAndroidNotificationChannelAsync(): Promise<void> {
   if (Platform.OS !== 'android') return;
@@ -112,6 +165,7 @@ export async function ensureAndroidNotificationChannelAsync(): Promise<void> {
  * quedarían "huérfanos" si no los cancelamos aquí.
  */
 export async function cancelAllWaterRemindersAsync(): Promise<void> {
+  clearWebReminderTimeouts();
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
@@ -123,12 +177,24 @@ export interface NotificationPermissionState {
 
 /** Consulta el estado actual del permiso de notificaciones, sin pedirlo. */
 export async function getNotificationPermissionState(): Promise<NotificationPermissionState> {
+  if (Platform.OS === 'web') {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return { granted: false, canAskAgain: false };
+    }
+    return {
+      granted: Notification.permission === 'granted',
+      canAskAgain: Notification.permission === 'default',
+    };
+  }
   const current = await Notifications.getPermissionsAsync();
   return { granted: current.granted, canAskAgain: current.canAskAgain };
 }
 
 /** Muestra el diálogo del sistema para pedir permiso de notificaciones. */
 export async function requestNotificationPermissionAsync(): Promise<boolean> {
+  if (Platform.OS === 'web') {
+    return requestWebNotificationPermission();
+  }
   const requested = await Notifications.requestPermissionsAsync({
     ios: { allowAlert: true, allowSound: true, allowBadge: false },
   });
@@ -162,6 +228,11 @@ export async function syncWaterReminders(
   settings: AppSettings,
   dailyGoalMl: number,
 ): Promise<void> {
+  if (Platform.OS === 'web') {
+    await scheduleWebReminders(summary, settings, dailyGoalMl);
+    return;
+  }
+
   const now = Date.now();
   const remainingMl = Math.max(dailyGoalMl - summary.totalMl, 0);
 

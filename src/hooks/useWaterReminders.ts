@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { AppSettings } from '../types/settings';
 import { DailySummary } from '../types/water';
 import {
@@ -67,7 +67,7 @@ export function useWaterReminders(
       return;
     }
     setPermissionStatus('denied');
-    Linking.openSettings();
+    if (Platform.OS !== 'web') Linking.openSettings();
   }, []);
 
   useEffect(() => {
