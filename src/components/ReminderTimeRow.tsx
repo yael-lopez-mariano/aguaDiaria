@@ -12,7 +12,7 @@ interface ReminderTimeRowProps {
   onChangeTime: (time: ReminderTime) => void;
 }
 
-const STEP_MINUTES = 15;
+const STEP_MINUTES = 1;
 const MINUTES_PER_DAY = 24 * 60;
 
 /** Suma (o resta) minutos a una hora del día, dando la vuelta a la medianoche. */
