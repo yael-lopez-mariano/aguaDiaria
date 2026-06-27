@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import BottomTabBar, { AppTab } from './src/components/BottomTabBar';
@@ -13,8 +13,20 @@ import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import StatsScreen from './src/screens/StatsScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
-import { cancelAllWaterRemindersAsync } from './src/services/notifications';
+import { cancelAllWaterRemindersAsync, syncWaterReminders } from './src/services/notifications';
 import { clearAllEntries } from './src/storage/waterStorage';
+import { DailySummary } from './src/types/water';
+
+// Resumen vacío: se usa al reprogramar recordatorios desde App.tsx,
+// donde no tenemos acceso al historial del día. Los recordatorios DAILY
+// se registran en el OS de todas formas; el cuerpo del mensaje se
+// actualiza la próxima vez que HomeScreen calcule el agua restante real.
+const EMPTY_SUMMARY: DailySummary = {
+  totalMl: 0,
+  count: 0,
+  drankInMorning: false,
+  drankInAfternoonOrNight: false,
+};
 
 /**
  * Punto de entrada de AguaDiaria.
@@ -32,6 +44,15 @@ export default function App() {
   const { dailyGoalMl, updateDailyGoal } = useDailyGoal();
   const { settings, updateSettings } = useAppSettings();
   const { userName, isLoadingUserName, saveUserName, resetUserName } = useUserName();
+
+  // Cuando el usuario cambia la hora de recordatorio en Configuración,
+  // HomeScreen está desmontado y no puede reprogramar. Este efecto lo hace
+  // desde App.tsx para que el cambio surta efecto de inmediato en el celular.
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      syncWaterReminders(EMPTY_SUMMARY, settings, dailyGoalMl);
+    }
+  }, [settings, dailyGoalMl]);
 
   const handleClearAllData = useCallback(async () => {
     await clearAllEntries();

@@ -24,29 +24,17 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const ANDROID_CHANNEL_ID = 'agua-diaria-recordatorios';
-
-/**
- * Nombre del archivo de sonido personalizado (una "gota de agua" sintetizada)
- * que se registra mediante el plugin de `expo-notifications` en `app.json`
- * (carpeta `assets/sounds/`). `expo-notifications` resuelve este mismo nombre
- * tanto para el canal de Android como para el contenido en iOS.
- */
-const WATER_DROP_SOUND = 'water_drop.wav';
+// v2 usa el sonido por defecto del sistema: el usuario lo controla desde
+// los ajustes de su celular igual que cualquier otra app de mensajería.
+// El canal v1 con sonido personalizado no se puede modificar en Android 8+,
+// así que usamos un id distinto para que el OS cree uno nuevo.
+const ANDROID_CHANNEL_ID = 'agua-diaria-v2';
 
 interface ReminderSlotConfig {
-  /** Identificador fijo: nos permite programar y cancelar siempre el mismo recordatorio. */
   id: string;
-  /** Qué horario de `settings.reminderTimes` le corresponde a este recordatorio. */
   moment: ReminderMoment;
   title: string;
-  /** A partir del resumen de hoy, decide si todavía hace falta recordarle al usuario. */
   isStillNeeded: (summary: DailySummary) => boolean;
-  /**
-   * Arma el mensaje de este recordatorio a partir de cuánta agua le falta al
-   * usuario para llegar a su meta. Así cada aviso refleja su progreso real
-   * del día en lugar de repetir siempre el mismo texto genérico.
-   */
   buildBody: (remainingMl: number) => string;
 }
 
@@ -181,12 +169,11 @@ export async function ensureAndroidNotificationChannelAsync(): Promise<void> {
 
   await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
     name: 'Recordatorios de hidratación',
-    importance: Notifications.AndroidImportance.DEFAULT,
-    vibrationPattern: [0, 200, 200, 200],
-    lightColor: colors.primary,
-    // En Android 8+ el sonido se controla desde el canal: aquí es donde
-    // realmente se aplica nuestro sonido de "gota de agua" personalizado.
-    sound: WATER_DROP_SOUND,
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: colors.teal,
+    // Sin sound personalizado: el OS usa el sonido de notificación que
+    // el usuario tiene configurado en su celular (igual que WhatsApp, etc.)
   });
 }
 
@@ -241,20 +228,17 @@ function getTodayAt(hour: number, minute: number): Date {
 }
 
 /**
- * Revisa los tres recordatorios del día y decide, para cada uno, si debe
- * quedar programado o cancelado:
+ * Sincroniza los tres recordatorios de hidratación.
  *
- *  - Se cancela si el usuario apagó las notificaciones, si su horario ya
- *    pasó hoy, o si ya registró agua en el momento del día que cubre.
- *  - Se programa (de nuevo), a la hora configurada en `settings`, si
- *    todavía no llega esa hora y el usuario aún no ha tomado agua en
- *    ese momento del día.
+ * En nativo (Android / iOS) programa recordatorios DIARIOS repetitivos:
+ * el OS los guarda y los dispara a su hora aunque la app esté cerrada,
+ * igual que las alarmas. Así no hace falta tener la app abierta cada día.
  *
- * Debe llamarse cada vez que cambie el resumen del día, la meta o la
- * configuración —por ejemplo, al abrir la app, justo después de registrar
- * agua, cuando el usuario cambia su meta diaria, o cuando ajusta sus
- * horarios en Configuración— para mantener los recordatorios sincronizados
- * con la realidad.
+ * En web usa setTimeout (solo mientras la PWA está abierta en el navegador,
+ * que es la limitación del navegador sin servidor push).
+ *
+ * Llamar esta función cada vez que cambie la hora, la meta o la config
+ * de notificaciones para que el celular siempre tenga el horario correcto.
  */
 export async function syncWaterReminders(
   summary: DailySummary,
@@ -266,41 +250,32 @@ export async function syncWaterReminders(
     return;
   }
 
-  const now = Date.now();
   const remainingMl = Math.max(dailyGoalMl - summary.totalMl, 0);
 
   for (const config of REMINDER_SLOT_CONFIGS) {
-    // Cancelamos siempre primero: como reutilizamos el mismo identificador
-    // cada día, esto evita que quede una copia duplicada programada y es
-    // la forma de "apagar" un recordatorio que ya no hace falta.
+    // Cancelamos primero para evitar duplicados al reprogramar.
     await Notifications.cancelScheduledNotificationAsync(config.id);
 
-    if (!settings.notificationsEnabled) {
-      continue;
-    }
+    if (!settings.notificationsEnabled) continue;
 
     const { hour, minute } = settings.reminderTimes[config.moment];
-    const triggerDate = getTodayAt(hour, minute);
-    const timeAlreadyPassed = triggerDate.getTime() <= now;
-
-    if (timeAlreadyPassed || !config.isStillNeeded(summary)) {
-      continue;
-    }
 
     await Notifications.scheduleNotificationAsync({
       identifier: config.id,
       content: {
         title: config.title,
+        // Cuando la app está abierta usamos el agua restante real;
+        // cuando el celular dispara el aviso al día siguiente el mensaje
+        // es el que quedó guardado la última vez que se sincronizó.
         body: config.buildBody(remainingMl),
-        // En iOS (y en Android 7 o anterior) el sonido se toma de aquí;
-        // en Android 8+ manda el sonido configurado en el canal.
-        sound: WATER_DROP_SOUND,
+        // Sin sound explícito: el canal v2 hereda el sonido del sistema.
       },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: triggerDate,
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour,
+        minute,
         channelId: Platform.OS === 'android' ? ANDROID_CHANNEL_ID : undefined,
-      },
+      } as Parameters<typeof Notifications.scheduleNotificationAsync>[0]['trigger'],
     });
   }
 }
