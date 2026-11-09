@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { QUICK_AMOUNTS } from '../constants/water';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
+import InfoButton from './InfoButton';
 import QuickAddButton from './QuickAddButton';
 
 interface QuickAddGridProps {
@@ -12,7 +14,10 @@ interface QuickAddGridProps {
 export default function QuickAddGrid({ onAdd }: QuickAddGridProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Registrar agua 🚰</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Registrar agua 🚰</Text>
+        <InfoButton info={INFO.quickAdd} />
+      </View>
       <View style={styles.grid}>
         {QUICK_AMOUNTS.map((option) => (
           <QuickAddButton key={option.amountMl} option={option} onPress={onAdd} />
@@ -27,11 +32,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginTop: 8,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 12,
   },
   grid: {
     flexDirection: 'row',

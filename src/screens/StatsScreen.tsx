@@ -83,7 +83,7 @@ export default function StatsScreen({ dailyGoalMl, onChangeGoal }: StatsScreenPr
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   scroll: {
     flex: 1,

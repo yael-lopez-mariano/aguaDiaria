@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
 import { AppSettings, ReminderMoment, ReminderTime } from '../types/settings';
+import InfoButton from './InfoButton';
 import ReminderTimeRow from './ReminderTimeRow';
 
 interface RemindersSettingsCardProps {
@@ -37,7 +39,10 @@ export default function RemindersSettingsCard({ settings, onChangeSettings }: Re
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <View style={styles.headerText}>
-          <Text style={styles.title}>Recordatorios 🔔</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>Recordatorios 🔔</Text>
+            <InfoButton info={INFO.reminders} />
+          </View>
           <Text style={styles.subtitle}>Avisos para tomar agua durante el día.</Text>
         </View>
         <Switch
@@ -82,6 +87,10 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     marginRight: 12,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   title: {
     fontSize: 18,

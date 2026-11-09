@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
 import { DailySummary } from '../types/water';
+import InfoButton from './InfoButton';
 
 interface DailySummaryCardProps {
   summary: DailySummary;
@@ -27,7 +29,10 @@ function SummaryRow({ emoji, label, value }: SummaryRowProps) {
 export default function DailySummaryCard({ summary }: DailySummaryCardProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Resumen de hoy 📋</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Resumen de hoy 📋</Text>
+        <InfoButton info={INFO.dailySummary} />
+      </View>
 
       <SummaryRow
         emoji="💧"
@@ -67,11 +72,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 12,
   },
   row: {
     flexDirection: 'row',

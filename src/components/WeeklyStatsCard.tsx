@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
 import { WeeklySummary } from '../types/water';
+import InfoButton from './InfoButton';
 import { formatWeekdayLabel } from '../utils/date';
 
 interface WeeklyStatsCardProps {
@@ -34,7 +36,10 @@ const CHART_HEIGHT = 70;
 export default function WeeklyStatsCard({ weeklySummary, goalMl }: WeeklyStatsCardProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tu semana 📅</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Tu semana 📅</Text>
+        <InfoButton info={INFO.weeklyStats} />
+      </View>
 
       <View style={styles.statsRow}>
         <Stat value={`${(weeklySummary.totalMl / 1000).toFixed(2)} L`} label="Total de la semana" />
@@ -83,11 +88,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 16,
   },
   statsRow: {
     flexDirection: 'row',

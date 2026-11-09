@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
+import InfoButton from './InfoButton';
 import { WaterEntry } from '../types/water';
 
 interface TodayHistoryListProps {
@@ -15,7 +17,10 @@ interface TodayHistoryListProps {
 export default function TodayHistoryList({ entries }: TodayHistoryListProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Historial de hoy 🕒</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Historial de hoy 🕒</Text>
+        <InfoButton info={INFO.todayHistory} />
+      </View>
 
       {entries.length === 0 ? (
         <Text style={styles.emptyText}>
@@ -41,11 +46,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     marginBottom: 32,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 12,
   },
   emptyText: {
     fontSize: 14,

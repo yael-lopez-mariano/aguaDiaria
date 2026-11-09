@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
 import { DailySummary } from '../types/water';
 import { getHydrationStatusMessage } from '../utils/waterSummary';
+import InfoButton from './InfoButton';
 import DailyProgressBar from './DailyProgressBar';
 
 interface DailyStatsCardProps {
@@ -35,7 +37,10 @@ export default function DailyStatsCard({ summary, goalMl }: DailyStatsCardProps)
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tu día hasta ahora 💧</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Tu día hasta ahora 💧</Text>
+        <InfoButton info={INFO.dailyStats} />
+      </View>
 
       <View style={styles.statsRow}>
         <Stat value={`${summary.totalMl} ml`} label="Total tomado" />
@@ -65,11 +70,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 16,
   },
   statsRow: {
     flexDirection: 'row',

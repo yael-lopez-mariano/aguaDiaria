@@ -5,9 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DateChipSelector from '../components/DateChipSelector';
 import HistoryEntryCard from '../components/HistoryEntryCard';
 import { colors } from '../constants/colors';
+import { INFO } from '../constants/info';
 import { deleteWaterEntry, filterEntriesByDate, getAllEntries } from '../storage/waterStorage';
 import { WaterEntry } from '../types/water';
 import { getTodayKey } from '../utils/date';
+import InfoButton from '../components/InfoButton';
 import { calculateDailySummary } from '../utils/waterSummary';
 
 /**
@@ -56,7 +58,10 @@ export default function HistoryScreen() {
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Historial 🕒</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>Historial 🕒</Text>
+          <InfoButton info={INFO.history} />
+        </View>
         <Text style={styles.subtitle}>Revisa y corrige tus registros de cualquier día</Text>
       </View>
 
@@ -104,11 +109,15 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 12,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   title: {
     fontSize: 26,

@@ -3,6 +3,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import BottomTabBar, { AppTab } from './src/components/BottomTabBar';
+import WaterBackground from './src/components/WaterBackground';
+import { colors } from './src/constants/colors';
 import { DAILY_GOAL_ML } from './src/constants/water';
 import { DEFAULT_SETTINGS } from './src/constants/settings';
 import { useAppSettings } from './src/hooks/useAppSettings';
@@ -84,6 +86,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
+        <WaterBackground />
         {activeTab === 'home' && (
           <HomeScreen dailyGoalMl={dailyGoalMl} settings={settings} userName={userName} />
         )}
@@ -109,5 +112,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
 });

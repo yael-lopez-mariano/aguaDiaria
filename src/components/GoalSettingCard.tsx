@@ -1,6 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
+import InfoButton from './InfoButton';
+import { INFO } from '../constants/info';
 
 interface GoalSettingCardProps {
   goalMl: number;
@@ -31,7 +33,10 @@ export default function GoalSettingCard({ goalMl, onChangeGoal }: GoalSettingCar
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <Text style={styles.title}>Meta diaria 🎯</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>Meta diaria 🎯</Text>
+          <InfoButton info={INFO.goal} />
+        </View>
         <Text style={styles.subtitle}>Ajusta cuánta agua quieres tomar cada día.</Text>
       </View>
 
@@ -76,6 +81,10 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     marginRight: 12,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   title: {
     fontSize: 16,

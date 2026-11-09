@@ -2,6 +2,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { colors, gradients } from '../constants/colors';
+import { INFO } from '../constants/info';
+import InfoButton from './InfoButton';
 
 interface WaterProgressProps {
   totalMl: number;
@@ -68,7 +70,10 @@ export default function WaterProgress({ totalMl, goalMl }: WaterProgressProps) {
       </Animated.View>
 
       <View style={styles.info}>
-        <Text style={styles.dropEmoji}>💧</Text>
+        <View style={styles.dropRow}>
+          <Text style={styles.dropEmoji}>💧</Text>
+          <InfoButton info={INFO.progress} />
+        </View>
         <Text style={styles.totalText}>{litersText}</Text>
         <Text style={styles.percentText}>{percentText}</Text>
         <Text style={styles.goalText}>{goalText}</Text>
@@ -108,9 +113,13 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     flexShrink: 1,
   },
+  dropRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
   dropEmoji: {
     fontSize: 24,
-    marginBottom: 2,
   },
   totalText: {
     fontSize: 26,

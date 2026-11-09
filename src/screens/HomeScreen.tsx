@@ -96,7 +96,7 @@ export default function HomeScreen({ dailyGoalMl, settings, userName }: HomeScre
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   scroll: {
     flex: 1,
