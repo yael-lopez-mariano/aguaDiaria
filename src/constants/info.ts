@@ -83,6 +83,8 @@ export const INFO = {
       'Cada gota vale 10 puntos y llena un poco el termo. Al llegar a 100 puntos el termo se llena y ganas una estrella ⭐.',
       'Si atrapas una bomba 💣 pierdes una vida. Con 3 bombas termina la partida.',
       'Las gotas y bombas caen cada vez más rápido. Tu récord, tus estrellas y tus partidas se guardan solos.',
+      'Hay 6 niveles con temática distinta: junta 10 ⭐ en un nivel para completarlo y desbloquear el siguiente (más rápido).',
+      'Con tus estrellas totales desbloqueas skins nuevas para el termo: Chicle (2), Galaxia (5), Fuego (10), Oro real (20) y Arcoíris (35).',
     ],
   },
 } satisfies Record<string, InfoTopic>;
