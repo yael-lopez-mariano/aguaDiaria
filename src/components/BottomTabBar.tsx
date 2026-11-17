@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../constants/colors';
 
-export type AppTab = 'home' | 'stats' | 'history' | 'settings';
+export type AppTab = 'home' | 'stats' | 'history' | 'game' | 'settings';
 
 interface BottomTabBarProps {
   activeTab: AppTab;
@@ -54,6 +54,12 @@ export default function BottomTabBar({ activeTab, onChangeTab }: BottomTabBarPro
           onPress={() => onChangeTab('history')}
         />
         <TabButton
+          label="Juego"
+          emoji="🎮"
+          isActive={activeTab === 'game'}
+          onPress={() => onChangeTab('game')}
+        />
+        <TabButton
           label="Ajustes"
           emoji="⚙️"
           isActive={activeTab === 'settings'}
@@ -87,7 +93,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     marginTop: 2,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: colors.textSecondary,
   },

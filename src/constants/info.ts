@@ -73,6 +73,16 @@ export const INFO = {
       'Recibirás avisos a las horas que elijas para recordarte tomar agua.',
       'En el celular necesitas dar permiso de notificaciones a la app.',
       'En la versión web los avisos solo llegan mientras la página está abierta.',
+      'Además, cada día a las 16:00 te invitamos a jugar un rato para despejarte.',
+    ],
+  },
+  game: {
+    title: 'Cómo jugar',
+    points: [
+      'Mueve el termo arrastrando el dedo (o el mouse, o las flechas del teclado) para atrapar las gotas.',
+      'Cada gota vale 10 puntos y llena un poco el termo. Al llegar a 100 puntos el termo se llena y ganas una estrella ⭐.',
+      'Si atrapas una bomba 💣 pierdes una vida. Con 3 bombas termina la partida.',
+      'Las gotas y bombas caen cada vez más rápido. Tu récord, tus estrellas y tus partidas se guardan solos.',
     ],
   },
 } satisfies Record<string, InfoTopic>;

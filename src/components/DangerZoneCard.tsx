@@ -23,7 +23,7 @@ export default function DangerZoneCard({ onConfirmClear }: DangerZoneCardProps) 
       {
         title: '¿Borrar todos tus datos?',
         message:
-          'Esto eliminará tus registros de agua, tu meta diaria, tus recordatorios y tu nombre guardado en este celular. La app quedará como recién instalada y volverá a pedirte tu nombre. Esta acción no se puede deshacer.',
+          'Esto eliminará tus registros de agua, tu meta diaria, tus recordatorios, tus partidas del juego y tu nombre guardado en este celular. La app quedará como recién instalada y volverá a pedirte tu nombre. Esta acción no se puede deshacer.',
         confirmLabel: 'Borrar todo',
       },
       onConfirmClear,
@@ -35,7 +35,7 @@ export default function DangerZoneCard({ onConfirmClear }: DangerZoneCardProps) 
       <Text style={styles.title}>Zona de riesgo ⚠️</Text>
       <Text style={styles.subtitle}>
         Borra de forma permanente todo lo que AguaDiaria guardó en este celular: tus registros,
-        tu meta diaria, tus recordatorios y tu nombre. Es como empezar de nuevo desde cero.
+        tu meta diaria, tus recordatorios, tus partidas del juego y tu nombre. Es como empezar de nuevo desde cero.
       </Text>
       <Pressable style={styles.button} onPress={handlePress}>
         <Text style={styles.buttonText}>Borrar todos los datos</Text>

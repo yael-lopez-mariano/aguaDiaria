@@ -1,3 +1,4 @@
+import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,12 +11,19 @@ import { DEFAULT_SETTINGS } from './src/constants/settings';
 import { useAppSettings } from './src/hooks/useAppSettings';
 import { useDailyGoal } from './src/hooks/useDailyGoal';
 import { useUserName } from './src/hooks/useUserName';
+import GameScreen from './src/screens/GameScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import StatsScreen from './src/screens/StatsScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
-import { cancelAllWaterRemindersAsync, syncWaterReminders } from './src/services/notifications';
+import {
+  cancelAllWaterRemindersAsync,
+  GAME_INVITE_DATA,
+  setOpenGameHandler,
+  syncWaterReminders,
+} from './src/services/notifications';
+import { clearGameData } from './src/storage/gameStorage';
 import { clearAllEntries } from './src/storage/waterStorage';
 import { DailySummary } from './src/types/water';
 
@@ -56,8 +64,23 @@ export default function App() {
     }
   }, [settings, dailyGoalMl]);
 
+  // Al tocar la notificación "¡Vamos a jugar!" abrimos directo la pestaña Juego.
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      setOpenGameHandler(() => setActiveTab('game'));
+      return () => setOpenGameHandler(null);
+    }
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      if (response.notification.request.content.data?.screen === GAME_INVITE_DATA.screen) {
+        setActiveTab('game');
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
   const handleClearAllData = useCallback(async () => {
     await clearAllEntries();
+    await clearGameData();
     await updateDailyGoal(DAILY_GOAL_ML);
     await updateSettings(DEFAULT_SETTINGS);
     // Cancelamos los recordatorios programados con la configuración anterior:
@@ -94,6 +117,7 @@ export default function App() {
           <StatsScreen dailyGoalMl={dailyGoalMl} onChangeGoal={updateDailyGoal} />
         )}
         {activeTab === 'history' && <HistoryScreen />}
+        {activeTab === 'game' && <GameScreen />}
         {activeTab === 'settings' && (
           <SettingsScreen
             dailyGoalMl={dailyGoalMl}

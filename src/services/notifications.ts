@@ -76,6 +76,34 @@ const REMINDER_SLOT_CONFIGS: ReminderSlotConfig[] = [
   },
 ];
 
+// ── Invitación diaria a jugar ─────────────────────────────────────────────────
+// Un aviso al día para que la persona se despeje unos minutos con el juego
+// "Llena el termo". Al tocarlo la app abre directamente la pestaña Juego.
+
+export const GAME_INVITE_ID = 'agua-invitacion-juego';
+const GAME_INVITE_TIME = { hour: 16, minute: 0 };
+const GAME_INVITE_TITLE = '¡Vamos a jugar! 🎮';
+const GAME_INVITE_MESSAGES = [
+  '¿Un descanso de 2 minutos? Atrapa gotas, esquiva bombas y llena el termo 💧💣',
+  'Tu récord te está esperando 🏆 Entra a jugar "Llena el termo" y despéjate un rato',
+  'Hora de una pausa: cada 100 puntos es una estrella ⭐ ¿Cuántas consigues hoy?',
+  'Deja la pantalla de trabajo un momento y ven a llenar el termo 💧 (y de paso toma agua)',
+];
+
+export function pickGameInviteMessage(): string {
+  return GAME_INVITE_MESSAGES[Math.floor(Math.random() * GAME_INVITE_MESSAGES.length)];
+}
+
+/** Datos que lleva la notificación para saber qué pestaña abrir al tocarla. */
+export const GAME_INVITE_DATA = { screen: 'game' } as const;
+
+let openGameHandler: (() => void) | null = null;
+
+/** App.tsx registra aquí cómo abrir la pestaña Juego (usado en web al hacer clic en el aviso). */
+export function setOpenGameHandler(handler: (() => void) | null): void {
+  openGameHandler = handler;
+}
+
 // ── Web notification support ──────────────────────────────────────────────────
 // Mensajes con humor para gente que se pasa el día en la computadora.
 // Cada momento tiene varias opciones: se elige una al azar para no repetir.
@@ -159,6 +187,24 @@ async function scheduleWebReminders(
 
     webReminderTimeouts.push(timeout);
   }
+
+  const inviteDelay = getTodayAt(GAME_INVITE_TIME.hour, GAME_INVITE_TIME.minute).getTime() - now;
+  if (inviteDelay > 0) {
+    webReminderTimeouts.push(
+      setTimeout(() => {
+        const notification = new Notification(GAME_INVITE_TITLE, {
+          body: pickGameInviteMessage(),
+          icon: '/icon-192.png',
+          badge: '/icon-192.png',
+        });
+        notification.onclick = () => {
+          window.focus();
+          openGameHandler?.();
+          notification.close();
+        };
+      }, inviteDelay),
+    );
+  }
 }
 
 // ── Native (Android / iOS) ────────────────────────────────────────────────────
@@ -228,7 +274,7 @@ function getTodayAt(hour: number, minute: number): Date {
 }
 
 /**
- * Sincroniza los tres recordatorios de hidratación.
+ * Sincroniza los tres recordatorios de hidratación y la invitación diaria a jugar.
  *
  * En nativo (Android / iOS) programa recordatorios DIARIOS repetitivos:
  * el OS los guarda y los dispara a su hora aunque la app esté cerrada,
@@ -278,4 +324,22 @@ export async function syncWaterReminders(
       } as Parameters<typeof Notifications.scheduleNotificationAsync>[0]['trigger'],
     });
   }
+
+  await Notifications.cancelScheduledNotificationAsync(GAME_INVITE_ID);
+  if (!settings.notificationsEnabled) return;
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: GAME_INVITE_ID,
+    content: {
+      title: GAME_INVITE_TITLE,
+      body: pickGameInviteMessage(),
+      data: GAME_INVITE_DATA,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour: GAME_INVITE_TIME.hour,
+      minute: GAME_INVITE_TIME.minute,
+      channelId: Platform.OS === 'android' ? ANDROID_CHANNEL_ID : undefined,
+    } as Parameters<typeof Notifications.scheduleNotificationAsync>[0]['trigger'],
+  });
 }
